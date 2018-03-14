@@ -82,12 +82,12 @@ def get_match_info(html):
     team2 = soup.find('div', class_=tag_team + 'right').find('span', class_=tag_span).contents[0]
     match_time = str(match_time.strftime('%H:%M'))
     score = soup.find('p', class_=tag_score).find_all('span')
-    score1 = score[0].contents
+    score = str(score[0].contents[0] + ' : ' + score[1].contents[0])
     match_info.append(tournament)
     match_info.append(match_time)
     match_info.append(team1)
     match_info.append(team2)
-    match_info.append(score1)
+    match_info.append(score)
     return match_info
 
 
