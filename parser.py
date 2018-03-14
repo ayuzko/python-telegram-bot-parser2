@@ -111,11 +111,19 @@ def crawler():
 
 def post(bot, update):
     matches = crawler()
-    print(matches)
-    # for m in matches:
-    #     if m is in database:
-    #         bot.send_message()
-    #         delete_last_from_base()
+    today_matches = {}
+    for match in matches:
+        if match[0] in today_matches:
+            today_matches[match[0]].append(match[1:])
+        else:
+            today_matches[match[0]] = [match[1:]]
+    today_matches_markdown = str('Итоги матчей: \n\n')
+    for match in today_matches.items():
+        matches = str()
+        for m in match[1]:
+            matches += m[0] + ' ' + m[1] + ' vs ' + m[2] + m[3] + '\n'
+        today_matches_markdown += '*' + match[0] + '*:\n' + matches + "\n"
+    bot.send_message(chat_id=config.chat_id, text=today_matches_markdown, parse_mode='Markdown')
 
 
 def main():
