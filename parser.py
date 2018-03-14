@@ -72,15 +72,15 @@ def get_html(url):
 def get_match_info(html):
     soup = BeautifulSoup(html, 'lxml')
     match_info = []
-    tag_duel = 'duel__team duel__team--'
     tag_score = 'duel__count-score'
     tournament = soup.find('div', class_='duel__wrapper container').find('a').contents[0]
     tournament = ' '.join(tournament.split())
     match_time = soup.find('time').contents[0]
     match_time = ' '.join(match_time.split())
     match_time = dateparser.parse(match_time)
-    team1 = soup.find('div', class_=tag_duel + 'left ').find('h2').contents[0]
-    team2 = soup.find('div', class_=tag_duel + 'right ').find('h2').contents[0]
+    teams = soup.find_all('h2', class_='duel__title')
+    team1 = teams[0].contents[0]
+    team2 = teams[1].contents[0]
     match_time = str(match_time.strftime('%H:%M'))
     score = soup.find('p', class_=tag_score).find_all('span')
     score = str(score[0].contents[0] + ':' + score[1].contents[0])
