@@ -1,0 +1,6 @@
+python-telegram-bot
+psycopg2
+bs4
+requests
+lxml
+dateparser
