@@ -107,6 +107,7 @@ def crawler():
     today_matches = []
     for l in links:
         today_matches.append(get_match_info(get_html(l)))
+        print(today_matches)
     return today_matches
 
 
