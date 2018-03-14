@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import requests
 from bs4 import BeautifulSoup
 from telegram.ext import Updater, CommandHandler
@@ -6,7 +5,7 @@ import logging
 import config
 import dateparser
 from datetime import datetime, time, timedelta
-from db_connect import write_to_base, read_from_base, create_table, truncate_all, delete_all
+#from db_connect import write_to_base, read_from_base, create_table, truncate_all, delete_all
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
