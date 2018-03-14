@@ -107,7 +107,6 @@ def crawler():
     today_matches = []
     for l in links:
         today_matches.append(get_match_info(get_html(l)))
-        print(today_matches)
     return today_matches
 
 
@@ -123,7 +122,7 @@ def post(bot, update):
     for match in today_matches.items():
         matches = str()
         for m in match[1]:
-            matches += m[0] + ' ' + m[1] + ' vs ' + m[2] + ' ' + m[3] + '\n'
+            matches += m[1] + ' vs ' + m[2] + ' ' + '<b>' + m[3] + '</b>' + '\n'
         today_matches_markdown += '<b>' + match[0] + '</b>:\n' + matches + "\n"
     bot.send_message(chat_id=config.chat_id, text=today_matches_markdown, parse_mode='HTML')
 
