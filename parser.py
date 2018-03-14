@@ -131,7 +131,7 @@ def main():
 
     now_time = datetime.now().time()
     job_queue = updater.job_queue
-    job = job_queue.run_ocne(post, 0)
+    job = job_queue.run_once(post, 0)
     updater.idle()
 
 
