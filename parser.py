@@ -5,7 +5,6 @@ import logging
 import config
 import dateparser
 from datetime import datetime, time, timedelta
-#from db_connect import write_to_base, read_from_base, create_table, truncate_all, delete_all
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -21,52 +20,6 @@ def error(bot, update, error):
 def get_html(url):
     r = requests.get(url)
     return r.text
-
-
-
-#
-#
-
-#
-#
-
-#
-#
-# def start():
-#     pass
-#
-#
-# def post(bot, update):
-#     get_matches = crawler()
-#     if not get_matches:
-#         bot.send_message(chat_id=config.chat_id, text='В следующие сутки матчей не будет')
-#         return
-#     today_matches = {}
-#     for match in get_matches:
-#         if match[0] in today_matches:
-#             today_matches[match[0]].append(match[1:])
-#         else:
-#             today_matches[match[0]] = [match[1:]]
-#     today_matches_markdown = str('Матчи на ближайшие сутки ({}): \n\n'.format(datetime.today().strftime("%d.%m")))
-#     for match in today_matches.items():
-#         matches = str()
-#         for m in match[1]:
-#             matches += m[0] + ' ' + m[1] + ' vs ' + m[2] + '\n'
-#         today_matches_markdown += '*' + match[0] + '*:\n' + matches + "\n"
-#     bot.send_message(chat_id=config.chat_id, text=today_matches_markdown, parse_mode='Markdown')
-#
-#
-# def send_document(bot, job):
-#     file_list = read_from_base(config.chat_id[job.context][1:])
-#     if not file_list:
-#         pass
-#     else:
-#         file_id = file_list[randint(0, len(file_list) - 1)][0]
-#         bot.send_document(config.chat_id[job.context], file_id)
-#         write_to_base(config.chat_id[job.context][1:], file_id, erase=True)
-#     job.context += 1
-#     if job.context == 5:
-#         job.context = 0
 
 
 def get_match_info(html):
@@ -106,41 +59,56 @@ def crawler():
     links = get_all_links(get_html(config.url))
     today_matches = []
     for l in links:
+        print(l)
         today_matches.append(get_match_info(get_html(l)))
     return today_matches
+
+
+def check_posted(match):
+    with open('db.txt', 'r') as f:
+        if str(match) in f.read():
+            return False
+        else:
+            return True
+
+
+def write_to_base(match):
+    with open('db.txt', 'a') as f:
+        f.write(str(match))
 
 
 def post(bot, update):
     matches = crawler()
     today_matches = {}
     for match in matches:
-        if match[0] in today_matches:
-            today_matches[match[0]].append(match[1:])
-        else:
-            today_matches[match[0]] = [match[1:]]
-    today_matches_markdown = str('Итоги матчей: \n\n')
+        if check_posted(match):
+            write_to_base(match)
+            if match[0] in today_matches:
+                today_matches[match[0]].append(match[1:])
+            else:
+                today_matches[match[0]] = [match[1:]]
+    print(today_matches)
+    today_matches_markdown = str()
     for match in today_matches.items():
         matches = str()
         for m in match[1]:
             matches += m[1] + ' vs ' + m[2] + ' ' + '<b>' + m[3] + '</b>' + '\n'
         today_matches_markdown += '<b>' + match[0] + '</b>:\n' + matches + "\n"
-    bot.send_message(chat_id=config.chat_id, text=today_matches_markdown, parse_mode='HTML')
+    if today_matches_markdown == str():
+        return
+    else:
+        bot.send_message(chat_id=config.chat_id, text=today_matches_markdown, parse_mode='HTML')
 
 
 def main():
     updater = Updater(config.token)
     dp = updater.dispatcher
-    #dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("post", post))
     dp.add_error_handler(error)
-    updater.start_webhook(listen="0.0.0.0",
-                          port=config.port,
-                          url_path=config.token)
-    updater.bot.set_webhook(config.bot_url + config.token)
-
     now_time = datetime.now().time()
     job_queue = updater.job_queue
-    job = job_queue.run_once(post, 0)
+    job = job_queue.run_repeating(post, 120, 0)
+    updater.start_polling()
     updater.idle()
 
 
