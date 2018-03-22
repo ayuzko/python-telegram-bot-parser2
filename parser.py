@@ -79,6 +79,7 @@ def write_to_base(match):
 
 def post(bot, update):
     matches = crawler()
+    print(matches)
     today_matches = {}
     for match in matches:
         if check_posted(match):
@@ -88,16 +89,16 @@ def post(bot, update):
             else:
                 today_matches[match[0]] = [match[1:]]
     print(today_matches)
-    today_matches_markdown = str()
+    today_matches_html = str()
     for match in today_matches.items():
         matches = str()
         for m in match[1]:
-            matches += m[1] + ' vs ' + m[2] + ' ' + '<b>' + m[3] + '</b>' + '\n'
-        today_matches_markdown += '<b>' + match[0] + '</b>:\n' + matches + "\n"
-    if today_matches_markdown == str():
+            matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n'
+        today_matches_html += '<b>' + match[0] + '</b>:\n' + matches + "\n"
+    if today_matches_html == str():
         return
     else:
-        bot.send_message(chat_id=config.chat_id, text=today_matches_markdown, parse_mode='HTML')
+        bot.send_message(chat_id=config.chat_id, text=today_matches_html, parse_mode='HTML')
 
 
 def main():
@@ -105,9 +106,8 @@ def main():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("post", post))
     dp.add_error_handler(error)
-    now_time = datetime.now().time()
     job_queue = updater.job_queue
-    job = job_queue.run_repeating(post, 120, 0)
+    job = job_queue.run_repeating(post, interval=120, first=0)
     updater.start_polling()
     updater.idle()
 
