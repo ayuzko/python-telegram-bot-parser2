@@ -107,7 +107,7 @@ def main():
     dp.add_error_handler(error)
     now_time = datetime.now().time()
     job_queue = updater.job_queue
-    job = job_queue.run_once(post, 0)
+    job = job_queue.run_repeating(post, 120, 0)
     updater.start_polling()
     updater.idle()
 
