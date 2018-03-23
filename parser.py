@@ -11,8 +11,13 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('Dota_result')
+
+def connect_to_db():
+    client = boto3.client('dynamodb',
+                          region_name='eu-west-1',
+                          aws_access_key_id=config.aaki,
+                          aws_secret_access_key=config.asac)
+    return client
 
 
 def error(bot, update, error):
@@ -67,21 +72,34 @@ def crawler():
 
 
 def check_posted(match):
-    response = table.get_item(
+    client = connect_to_db()
+    response = client.get_item(
+        TableName='Dota_result',
         Key={
-            'Match_result': match,
+            'Match_result':
+                {
+                   'S': str(match),
+                }
         }
     )
     if response:
+        print('False')
         return False
+
     else:
+        print('True')
         return True
 
 
 def write_to_base(match):
-    table.put_item(
+    client = connect_to_db()
+    client.put_item(
+        TableName='Dota_result',
         Item={
-            'Match_result': match,
+            'Match_result':
+                {
+                   'S': str(match),
+                }
         }
     )
 
