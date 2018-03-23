@@ -4,7 +4,6 @@ from telegram.ext import Updater, CommandHandler
 import logging
 import config
 import dateparser
-from datetime import datetime, time, timedelta
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -59,13 +58,13 @@ def crawler():
     links = get_all_links(get_html(config.url))
     today_matches = []
     for l in links:
-        print(l)
         today_matches.append(get_match_info(get_html(l)))
     return today_matches
 
 
 def check_posted(match):
     with open('db.txt', 'r') as f:
+        print('Writing')
         if str(match) in f.read():
             return False
         else:
@@ -74,6 +73,7 @@ def check_posted(match):
 
 def write_to_base(match):
     with open('db.txt', 'a') as f:
+        print('Read')
         f.write(str(match))
 
 
