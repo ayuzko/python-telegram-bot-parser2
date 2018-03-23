@@ -4,11 +4,15 @@ from telegram.ext import Updater, CommandHandler
 import logging
 import config
 import dateparser
+import boto3
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Dota_result')
 
 
 def error(bot, update, error):
@@ -63,18 +67,23 @@ def crawler():
 
 
 def check_posted(match):
-    with open('db.txt', 'r') as f:
-        print('Writing')
-        if str(match) in f.read():
-            return False
-        else:
-            return True
+    response = table.get_item(
+        Key={
+            'Match_result': match,
+        }
+    )
+    if response:
+        return False
+    else:
+        return True
 
 
 def write_to_base(match):
-    with open('db.txt', 'a') as f:
-        print('Read')
-        f.write(str(match))
+    table.put_item(
+        Item={
+            'Match_result': match,
+        }
+    )
 
 
 def post(bot, update):
