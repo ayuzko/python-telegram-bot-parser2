@@ -73,28 +73,21 @@ def crawler():
 
 def check_posted(match):
     client = connect_to_db()
-    response = client.get_item(
-        TableName='Dota_result',
-        Key={
-            'Match_result':
-                {
-                   'S': str(match),
-                }
-        }
-    )
-    if response:
-        print('False')
+    response = client.query(
+        TableName=config.table_name,
+        KeyConditionExpression='Match_result = :a',
+        ExpressionAttributeValues={':a': {'S': str(match)}}
+               )
+    if response['Items']:
         return False
-
     else:
-        print('True')
         return True
 
 
 def write_to_base(match):
     client = connect_to_db()
     client.put_item(
-        TableName='Dota_result',
+        TableName=config.table_name,
         Item={
             'Match_result':
                 {
@@ -106,7 +99,6 @@ def write_to_base(match):
 
 def post(bot, update):
     matches = crawler()
-    print(matches)
     today_matches = {}
     for match in matches:
         if check_posted(match):
@@ -115,7 +107,6 @@ def post(bot, update):
                 today_matches[match[0]].append(match[1:])
             else:
                 today_matches[match[0]] = [match[1:]]
-    print(today_matches)
     today_matches_html = str()
     for match in today_matches.items():
         matches = str()
