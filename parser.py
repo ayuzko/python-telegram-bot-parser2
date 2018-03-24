@@ -45,11 +45,13 @@ def get_match_info(html):
     match_time = str(match_time.strftime('%H:%M'))
     score = soup.find('p', class_=tag_score).find_all('span')
     score = str(score[0].contents[0] + ':' + score[1].contents[0])
+    match_text = soup.find('div', class_='type_page').find('p').find('p').contents
     match_info.append(tournament)
     match_info.append(match_time)
     match_info.append(team1)
     match_info.append(team2)
     match_info.append(score)
+    match_info.append(match_text)
     return match_info
 
 
@@ -111,7 +113,10 @@ def post(bot, update):
     for match in today_matches.items():
         matches = str()
         for m in match[1]:
-            matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n'
+            if m[4]:
+                matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n' + m[4] + '\n'
+            else:
+                matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n'
         today_matches_html += '<b>' + match[0] + '</b>:\n' + matches + "\n"
     if today_matches_html == str():
         return
