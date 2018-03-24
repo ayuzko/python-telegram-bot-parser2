@@ -45,14 +45,17 @@ def get_match_info(html):
     match_time = str(match_time.strftime('%H:%M'))
     score = soup.find('p', class_=tag_score).find_all('span')
     score = str(score[0].contents[0] + ':' + score[1].contents[0])
-    match_text = soup.find('div', class_='type_page').find('p').find('p').contents
     match_info.append(tournament)
     match_info.append(match_time)
     match_info.append(team1)
     match_info.append(team2)
     match_info.append(score)
-    match_info.append(match_text)
-    return match_info
+    try:
+        match_text = soup.find('div', class_='type_page').find('p').find('p').contents[0]
+        match_info.append(match_text)
+    except AttributeError:
+        return match_info
+
 
 
 def get_all_links(html):
