@@ -54,9 +54,8 @@ def get_match_info(html):
         match_text = soup.find('div', class_='type_page').find('p').find('p').contents[0]
         match_info.append(match_text)
     except AttributeError:
-        pass
+        print('AttributeError')
     return match_info
-
 
 
 def get_all_links(html):
@@ -65,8 +64,6 @@ def get_all_links(html):
     urls = []
     for url in matches:
         u = url.find('a').get('href')
-
-
         urls.append(config.url[:25] + u)
     return urls
 
