@@ -93,8 +93,8 @@ def check_posted(match):
     client = connect_to_db()
     response = client.query(
         TableName=config.table_name,
-        KeyConditionExpression='Match_result = :a',
-        ExpressionAttributeValues={':a': {'S': str(match)}}
+        KeyConditionExpression='begins_with ( Match_result, :a )',
+        ExpressionAttributeValues={':a': {'S': str(match[0:3])}}
                )
     if response['Items']:
         return False
