@@ -116,7 +116,7 @@ def post(bot, update):
     for match in today_matches.items():
         matches = str()
         for m in match[1]:
-            if len(m) == 4:
+            if len(m) == 5:
                 matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n' + m[4] + '\n'
             else:
                 matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n'
