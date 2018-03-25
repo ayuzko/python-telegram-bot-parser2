@@ -5,11 +5,17 @@ import logging
 import config
 import dateparser
 import boto3
+import dateparser
+import re
 
+TAG_RE = re.compile(r'<[^>]+>')
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
-
 logger = logging.getLogger(__name__)
+
+
+def remove_tags(text):
+    return TAG_RE.sub('', text)
 
 
 def connect_to_db():
@@ -51,7 +57,14 @@ def get_match_info(html):
     match_info.append(team2)
     match_info.append(score)
     try:
-        match_text = soup.find('div', class_='type_page').find('p').find('p').contents[0]
+        match_text_raw = soup.find('div', class_='type-page').find_all('p')
+        match_text = str()
+        for t in match_text_raw[1:]:
+            t = remove_tags(str(t))
+            t = t.replace('\xa0 ', '')
+            t = t.replace('\xa0', '')
+            t = t.replace('  ', ' ')
+            match_text += t
         match_info.append(match_text)
     except AttributeError:
         print('AttributeError')
