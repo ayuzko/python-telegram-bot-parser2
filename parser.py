@@ -14,7 +14,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
-def sql_command(sql, fetch, *args):
+def sql_command(sql, fetch):
     conn = psycopg2.connect(
         database='postgres',
         user=config.awsuser,
@@ -25,7 +25,7 @@ def sql_command(sql, fetch, *args):
     cursor = conn.cursor()
     cursor.execute(sql)
     if fetch:
-        rows = cursor.fetchone()
+        rows = cursor.fetchall()
         conn.close()
         return rows
     conn.commit()
@@ -40,11 +40,12 @@ def write_to_base(table_id, match_info, match_text):
 
 
 def check_posted(match_info):
-    rows = sql_command("SELECT * FROM dota_info WHERE match_info LIKE '{}%';".format(match_info), fetch=True)
-    if rows:
-        return False
-    else:
-        return True
+    rows = sql_command("SELECT * FROM dota_info", fetch=True)
+    for row in rows:
+        if row[0] == match_info:
+            return True
+        else:
+            return False
 
 
 def remove_tags(text):
