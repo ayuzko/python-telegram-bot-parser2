@@ -119,6 +119,7 @@ def post(bot, update):
     matches = crawler()
     today_matches = {}
     for match in matches:
+        print(match)
         if not check_posted(match[0:4]):
             if len(match) == 5:
                 write_to_base(match[0:4], match[5])
