@@ -121,7 +121,7 @@ def post(bot, update):
     for match in matches:
         print(match)
         if not check_posted(match[0:4]):
-            if len(match) == 5:
+            if len(match) == 6:
                 write_to_base(match[0:4], match[5])
             else:
                 write_to_base(match)
