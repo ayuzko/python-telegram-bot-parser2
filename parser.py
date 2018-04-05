@@ -1,12 +1,12 @@
+import psycopg2
 import requests
 from bs4 import BeautifulSoup
 from telegram.ext import Updater, CommandHandler
 import logging
 import config
 import dateparser
-import boto3
-import dateparser
 import re
+
 
 TAG_RE = re.compile(r'<[^>]+>')
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -14,16 +14,41 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 
+def sql_command(sql, fetch, *args):
+    conn = psycopg2.connect(
+        database='postgres',
+        user=config.awsuser,
+        password=config.awspass,
+        host=config.awshost,
+        port='5432'
+    )
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    if fetch:
+        rows = cursor.fetchone()
+        conn.close()
+        return rows
+    conn.commit()
+    conn.close()
+
+
+def write_to_base(table_id, match_info, match_text):
+    if not match_text:
+        sql_command("INSERT INTO dota_info VALUES ('{}')".format(match_info), fetch=False)
+    else:
+        sql_command("INSERT INTO dota_info (match_info, match_text) VALUES ('{}', '{}')".format(match_info, match_text), fetch=False)
+
+
+def check_posted(match_info):
+    rows = sql_command("SELECT * FROM dota_info WHERE match_info LIKE '{}%';".format(match_info), fetch=True)
+    if rows:
+        return False
+    else:
+        return True
+
+
 def remove_tags(text):
     return TAG_RE.sub('', text)
-
-
-def connect_to_db():
-    client = boto3.client('dynamodb',
-                          region_name='eu-west-1',
-                          aws_access_key_id=config.aaki,
-                          aws_secret_access_key=config.asac)
-    return client
 
 
 def error(bot, update, error):
@@ -89,38 +114,15 @@ def crawler():
     return today_matches
 
 
-def check_posted(match):
-    client = connect_to_db()
-    response = client.query(
-        TableName=config.table_name,
-        KeyConditionExpression='Match_result = :a',
-        ExpressionAttributeValues={':a': {'S': str(match[0:3])}}
-               )
-    if response['Items']:
-        return False
-    else:
-        return True
-
-
-def write_to_base(match):
-    client = connect_to_db()
-    client.put_item(
-        TableName=config.table_name,
-        Item={
-            'Match_result':
-                {
-                   'S': str(match),
-                }
-        }
-    )
-
-
 def post(bot, update):
     matches = crawler()
     today_matches = {}
     for match in matches:
-        if check_posted(match):
-            write_to_base(match)
+        if check_posted(match[0:4]):
+            if len(match) == 5:
+                write_to_base(match[0:4], match[5])
+            else:
+                write_to_base(match)
             if match[0] in today_matches:
                 today_matches[match[0]].append(match[1:])
             else:
