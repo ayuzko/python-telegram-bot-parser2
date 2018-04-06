@@ -32,7 +32,7 @@ def sql_command(sql, fetch):
     conn.close()
 
 
-def write_to_base(table_id, match_info, *args):
+def write_to_base(match_info, *args):
     if not args:
         sql_command("INSERT INTO dota_info VALUES ('{}')".format(match_info), fetch=False)
     else:
