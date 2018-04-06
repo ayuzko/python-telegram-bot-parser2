@@ -38,6 +38,7 @@ def write_to_base(match_info, *args):
                     " VALUES ('{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2], match_info[3],
                                                               match_info[4]), fetch=False)
     else:
+        print(match_info, args)
         sql_command("INSERT INTO dota_info (match_trmt, match_time, match_team1, match_team2, match_result, match_text)"
                     " VALUES ('{}', '{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2],
                                                                     match_info[3], match_info[4], args), fetch=False)
