@@ -130,11 +130,11 @@ def post(bot, update):
     today_matches = {}
     for match in matches:
         print(match)
-        print(match[0:4])
+        print(match[0:5])
         print(match[5])
         #if not check_posted(match[0:4]):
         if len(match) == 6:
-            write_to_base(match[0:4], match[5])
+            write_to_base(match[0:5], match[5])
         else:
             write_to_base(match)
         if match[0] in today_matches:
