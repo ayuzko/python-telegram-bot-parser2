@@ -129,6 +129,7 @@ def post(bot, update):
     matches = crawler()
     today_matches = {}
     for match in matches:
+        print(match)
         print(match[0:4])
         print(match[5])
         #if not check_posted(match[0:4]):
