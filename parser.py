@@ -34,13 +34,17 @@ def sql_command(sql, fetch):
 
 def write_to_base(match_info, *args):
     if not args:
-        sql_command("INSERT INTO dota_info VALUES ('{}')".format(match_info), fetch=False)
+        sql_command("INSERT INTO dota_info (match_trmt, match_time, match_team1, match_team2, match_result)"
+                    " VALUES ('{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2], match_info[3],
+                                                              match_info[4]), fetch=False)
     else:
-        sql_command("INSERT INTO dota_info (match_info, match_text) VALUES ('{}', '{}')".format(match_info, args), fetch=False)
+        sql_command("INSERT INTO dota_info (match_trmt, match_time, match_team1, match_team2, match_result, match_text)"
+                    " VALUES ('{}', '{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2],
+                                                                    match_info[3], match_info[4], args), fetch=False)
 
 
 def check_posted(match_info):
-    rows = sql_command("SELECT * FROM dota_info", fetch=True)
+    rows = sql_command("SELECT * FROM dota_info ", fetch=True)
     for row in rows:
         if row[0] == match_info:
             return True
@@ -120,15 +124,15 @@ def post(bot, update):
     today_matches = {}
     for match in matches:
         print(match)
-        if not check_posted(match[0:4]):
-            if len(match) == 6:
-                write_to_base(match[0:4], match[5])
-            else:
-                write_to_base(match)
-            if match[0] in today_matches:
-                today_matches[match[0]].append(match[1:])
-            else:
-                today_matches[match[0]] = [match[1:]]
+        #if not check_posted(match[0:4]):
+        if len(match) == 6:
+            write_to_base(match[0:4], match[5])
+        else:
+            write_to_base(match)
+        if match[0] in today_matches:
+            today_matches[match[0]].append(match[1:])
+        else:
+            today_matches[match[0]] = [match[1:]]
     today_matches_html = str()
     for match in today_matches.items():
         matches = str()
