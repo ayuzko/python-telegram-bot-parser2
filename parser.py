@@ -35,11 +35,11 @@ def sql_command(sql, fetch):
 def write_to_base(match_info, *args):
     if not args:
         sql_command("INSERT INTO dota_info (match_trmt, match_time, match_team1, match_team2, match_result)"
-                    " VALUES ('{}', '{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2], match_info[3],
+                    "VALUES ('{}', '{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2], match_info[3],
                                                               match_info[4]), fetch=False)
     else:
         sql_command("INSERT INTO dota_info (match_trmt, match_time, match_team1, match_team2, match_result, match_text)"
-                    " VALUES ('{}', '{}', '{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2],
+                    "VALUES ('{}', '{}', '{}', '{}', '{}', '{}')".format(match_info[0], match_info[1], match_info[2],
                                                                     match_info[3], match_info[4], args[0]), fetch=False)
 
 
@@ -94,6 +94,7 @@ def get_match_info(html):
             t = t.replace('\xa0 ', '')
             t = t.replace('\xa0', '')
             t = t.replace('  ', ' ')
+            t = t.replace("'", "''")
             match_text += t
         match_info.append(match_text)
     except AttributeError:
