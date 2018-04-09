@@ -44,12 +44,10 @@ def write_to_base(match_info, *args):
 
 
 def check_posted(match_info):
-    rows = sql_command("SELECT * FROM dota_info ", fetch=True)
-    for row in rows:
-        if row[0] == match_info:
-            return True
-        else:
-            return False
+    rows = sql_command(
+        "SELECT * FROM dota_info WHERE match_trmt = '{}' AND match_time = '{}' AND match_team1 = '{}' ".format(
+            match_info[0], match_info[1], match_info[2]), fetch=True)
+    return rows
 
 
 def remove_tags(text):
@@ -124,22 +122,22 @@ def post(bot, update):
     matches = crawler()
     today_matches = {}
     for match in matches:
-        #if not check_posted(match[0:4]):
-        if len(match) == 6:
-            write_to_base(match[0:5], match[5])
-        else:
-            write_to_base(match)
-        if match[0] in today_matches:
-            today_matches[match[0]].append(match[1:])
-        else:
-            today_matches[match[0]] = [match[1:]]
+        if not check_posted(match[0:3]):
+            if len(match) == 6:
+                write_to_base(match[0:5], match[5])
+            else:
+                write_to_base(match)
+            if match[0] in today_matches:
+                today_matches[match[0]].append(match[1:])
+            else:
+                today_matches[match[0]] = [match[1:]]
     today_matches_html = str()
     for match in today_matches.items():
         matches = str()
         for m in match[1]:
-            # if len(m) == 5:
-            #     matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n' + m[4].replace["''", "'"] + '\n'
-            # else:
+            if len(m) == 5:
+                matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n' + m[4].replace["''", "'"] + '\n'
+            else:
             matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n'
         today_matches_html += '<b>' + match[0] + '</b>:\n' + matches + "\n"
     if today_matches_html == str():
