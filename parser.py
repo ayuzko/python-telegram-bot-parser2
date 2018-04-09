@@ -136,7 +136,7 @@ def post(bot, update):
         matches = str()
         for m in match[1]:
             if len(m) == 5:
-                matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n' + m[4].replace["''", "'"] + '\n'
+                matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n' + m[4].replace("''", "'") + '\n'
             else:
                 matches += m[1] + ' vs ' + m[2] + ' <b>' + m[3] + '</b>' + '\n'
         today_matches_html += '<b>' + match[0] + '</b>:\n' + matches + "\n"
